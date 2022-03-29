@@ -7,18 +7,20 @@
 #include <vector>
 
 class BSTree {
+#define NIL INT_MIN
 private:
     int*    _tree;
     size_t  _capacity;
     size_t  _size;
     size_t  _depth;
 
+    //Adds a new row to the tree
     void resize()
     {
         if(_tree == nullptr)
         {
             _tree = new int[1];
-            _tree[0] = INT_MIN;
+            _tree[0] = NIL;
             _capacity = 1;
             _depth = 0;
         }
@@ -31,7 +33,7 @@ private:
             for(size_t i = 0; i < _capacity; i++)
                 new_tree[i] = _tree[i];
             for(size_t i = _capacity; i < new_capacity; i++)
-                new_tree[i] = INT_MIN;
+                new_tree[i] = NIL;
             
             delete[] _tree;
             _tree     = new_tree;
@@ -45,22 +47,23 @@ private:
 
     size_t right_child(size_t index) const { return index * 2 + 2; }
 
-    void insert_helper(int const x, size_t index)
+    void insert(int const x, size_t index)
     {
         if(_capacity <= index)
             resize();
 
-        if(_tree[index] == INT_MIN)
+        if(_tree[index] == NIL)
         {
             _tree[index] = x;
             _size++;
         }
         else if(x < _tree[index])
-            insert_helper(x, left_child(index));
+            insert(x, left_child(index));
         else
-            insert_helper(x, right_child(index));
+            insert(x, right_child(index));
     }
 
+    //print all raw tree information
     void print_debug(std::ostream& out = std::cout)
     {
         out << "DEBUG:" << std::endl;
@@ -70,7 +73,7 @@ private:
         out << "Array: " << std::endl;
         for(size_t i=0; i< _capacity; i++)
         {
-            if(_tree[i] == INT_MIN)
+            if(_tree[i] == NIL)
                 out << "X ";
             else
                 out << _tree[i] << " ";
@@ -150,7 +153,7 @@ public:
 
     bool empty() const { return _size == 0; }
 
-    void insert(int const x) { insert_helper(x, 0); }
+    void insert(int const x) { insert(x, 0); }
 
     void print_tree(std::ostream& out = std::cout) const
     {
@@ -160,7 +163,7 @@ public:
         {
             for(size_t j = 0; j < pow(2,i); j++)
             {
-                if(_tree[counter] == INT_MIN)
+                if(_tree[counter] == NIL)
                     out << "X ";
                 else
                     out << _tree[counter] << " ";
@@ -170,18 +173,20 @@ public:
         }
     }
 
+    //returns the nodes at maximum depth along with the depth
     std::pair<std::vector<int>, int> maximum_depth_nodes() const
     {
         std::pair<std::vector<int>, int> ret;
         size_t start_index = pow(2, _depth) - 1;
         for(size_t i = start_index; i < _capacity; i++)
-            if(_tree[i] != INT_MIN)
+            if(_tree[i] != NIL)
                 ret.first.push_back(_tree[i]);
         ret.second = _depth;
         return ret;
     }
     
 };
+// class BSTree
 
 std::ostream& operator<<(std::ostream& out, BSTree const& tree)
 {
